@@ -898,44 +898,47 @@ with main_tab2:
     st.markdown("### 🔍 Advanced Interactive Grid")
     st.write("Perfect for sorting, multi-column searching, and export to CSV/Excel.")
     
-    # Color formatting function for status
-    def color_status_html(val):
-        if 'OPEN' in str(val).upper():
-            return 'background-color: #d4edda; color: #155724; font-weight: bold'
-        elif 'CLOSED' in str(val).upper():
-            return 'background-color: #f8d7da; color: #721c24; font-weight: bold'
-        elif 'PLAN' in str(val).upper():
-            return 'background-color: #fff3cd; color: #856404; font-weight: bold'
-        return ''
+    # Color the Conference, Abstract Deadline, and Status cells based on row status
+    HIGHLIGHT_COLS = {'Conference', 'Formatted Abstract', 'Computed Status'}
 
-    try:
-        styled_df_tab2 = filtered_df.style.map(color_status_html, subset=['Computed Status'])
-    except AttributeError:
-        styled_df_tab2 = filtered_df.style.applymap(color_status_html, subset=['Computed Status'])
+    def color_row_by_status(row):
+        status = str(row.get('Computed Status', '')).upper()
+        if 'OPEN' in status:
+            style = 'background-color: #dcfce7; color: #166534; font-weight: 600'
+        elif 'CLOSED' in status:
+            style = 'background-color: #fee2e2; color: #991b1b; font-weight: 600'
+        elif 'PLAN' in status:
+            style = 'background-color: #fef3c7; color: #92400e; font-weight: 600'
+        else:
+            style = ''
+        return [style if col in HIGHLIGHT_COLS else '' for col in row.index]
+
+    styled_df_tab2 = filtered_df.style.apply(color_row_by_status, axis=1)
 
     st.dataframe(
         styled_df_tab2,
         column_order=[
-            'Conference', 'Focus Area', 'Location', 'Formatted Abstract', 'Days to Abstract_disp',
-            'Formatted Deadline', 'Days to Deadline_disp', 'Formatted Dates', 'Computed Status', 
+            'Conference', 'Formatted Abstract', 'Computed Status',
+            'Focus Area', 'Location', 'Days to Abstract_disp',
+            'Formatted Deadline', 'Days to Deadline_disp', 'Formatted Dates',
             'Available Tracks', 'Acceptance Difficulty', 'Credibility Score', 'Official Website'
         ],
         use_container_width=True,
         hide_index=True,
         column_config={
-            "Conference": st.column_config.TextColumn("Conference Name", width="medium"),
-            "Focus Area": st.column_config.TextColumn("Focus Area", width="small"),
-            "Location": st.column_config.TextColumn("Location", width="small"),
-            "Formatted Abstract": st.column_config.TextColumn("Abstract Deadline", width="small"),
-            "Days to Abstract_disp": st.column_config.TextColumn("Abstract Countdown", width="small"),
-            "Formatted Deadline": st.column_config.TextColumn("Submission Deadline", width="small"),
-            "Days to Deadline_disp": st.column_config.TextColumn("Paper Countdown", width="small"),
-            "Formatted Dates": st.column_config.TextColumn("Dates", width="small"),
-            "Computed Status": st.column_config.TextColumn("Status", width="small"),
-            "Available Tracks": st.column_config.TextColumn("Tracks", width="small"),
-            "Acceptance Difficulty": st.column_config.TextColumn("Difficulty", width="small"),
-            "Credibility Score": st.column_config.TextColumn("Credibility Score", width="small"),
-            "Official Website": st.column_config.LinkColumn("Website", width="small")
+            "Conference": st.column_config.TextColumn("Conference Name"),
+            "Focus Area": st.column_config.TextColumn("Focus Area"),
+            "Location": st.column_config.TextColumn("Location"),
+            "Formatted Abstract": st.column_config.TextColumn("Abstract Deadline"),
+            "Days to Abstract_disp": st.column_config.TextColumn("Abstract Countdown"),
+            "Formatted Deadline": st.column_config.TextColumn("Submission Deadline"),
+            "Days to Deadline_disp": st.column_config.TextColumn("Paper Countdown"),
+            "Formatted Dates": st.column_config.TextColumn("Dates"),
+            "Computed Status": st.column_config.TextColumn("Status"),
+            "Available Tracks": st.column_config.TextColumn("Tracks"),
+            "Acceptance Difficulty": st.column_config.TextColumn("Difficulty"),
+            "Credibility Score": st.column_config.TextColumn("Credibility Score"),
+            "Official Website": st.column_config.LinkColumn("Website")
         }
     )
 
