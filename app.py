@@ -785,14 +785,19 @@ if only_india:
     filtered_df = filtered_df[filtered_df['Location'].str.contains("India", case=False, na=False)]
 
 # --- SORTING LOGIC ---
-# Group open conferences first (0) and closed last (1), then sort by Abstract Deadline ascending
+# Order: (1) Open + upcoming abstract deadline (ascending by date)
+#        (2) Open + abstract deadline already passed / missing
+#        (3) Closed conferences
 filtered_df['Is Closed'] = (filtered_df['Computed Status'] == "CLOSED").astype(int)
+filtered_df['Abstract Passed'] = (
+    ~((filtered_df['Days to Abstract'].notna()) & (filtered_df['Days to Abstract'] >= 0))
+).astype(int)
 filtered_df = filtered_df.sort_values(
-    by=['Is Closed', 'Abstract Deadline_dt'],
-    ascending=[True, True],
+    by=['Is Closed', 'Abstract Passed', 'Abstract Deadline_dt'],
+    ascending=[True, True, True],
     na_position='last'
 )
-filtered_df = filtered_df.drop(columns=['Is Closed'])
+filtered_df = filtered_df.drop(columns=['Is Closed', 'Abstract Passed'])
 
 
 # --- STATS ROW ---
