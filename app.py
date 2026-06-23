@@ -920,8 +920,12 @@ with main_tab2:
 
     styled_df_tab2 = filtered_df.style.apply(color_row_by_status, axis=1)
 
+    # Fit table height to all rows so the table grows with the page (no inner scroll)
+    table_height = 38 + 35 * max(len(filtered_df), 1)
+
     st.dataframe(
         styled_df_tab2,
+        height=table_height,
         column_order=[
             'Conference', 'Formatted Abstract', 'Computed Status',
             'Focus Area', 'Location', 'Days to Abstract_disp',
